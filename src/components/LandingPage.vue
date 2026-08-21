@@ -1,7 +1,6 @@
 <template>
-  <header class="flex justify-between items-center px-6 py-4 sm:px-10 bg-white shadow">
-    <img :src="logo" alt="Norte Data" class="h-10 sm:h-12" />
-
+  <header class="flex justify-between items-center px-6 py-4 sm:px-10 bg-white shadow h-20">
+    <img :src="logo" alt="Norte Data" class="h-20 sm:h-24" />
     <nav class="hidden md:flex gap-8 font-medium text-slate-900">
       <a href="#inicio" class="hover:text-red-600">Início</a>
       <a href="#solucao" class="hover:text-red-600">Solução</a>
@@ -30,7 +29,7 @@
         </p>
         <button
           type="button"
-          @click="acessarSistema"
+          @click="irParaCadastro"
           class="mt-8 px-8 py-3 font-semibold bg-red-600 text-white rounded transition hover:bg-red-700 cursor-pointer"
         >
           Cadastre-se e acesse a plataforma.
@@ -56,30 +55,37 @@
     </section>
 
     <section id="recursos" class="px-6 py-16 sm:px-10 bg-gray-50">
-      <h2 class="text-center text-2xl font-bold text-slate-900">O que o sistema faz</h2>
-      <ul class="flex flex-col text-center mx-auto mt-6 max-w-2xl gap-2 text-gray-700">
-        <li>Upload automático de planilhas</li>
-        <li>Tratamento e padronização de dados</li>
-        <li>Gráficos e dashboards interativos</li>
-        <li>Insights estratégicos para a empresa</li>
-      </ul>
+      <h2 class="text-center text-2xl font-bold text-slate-900">O que o sistema faz:</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mx-auto mt-10 max-w-6xl">
+        <article
+          v-for="recurso in recursos"
+          :key="recurso.title"
+          class="group relative flex flex-col justify-end aspect-video overflow-hidden bg-gray-100 rounded-lg border border-gray-200 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg"
+        >
+          <div
+            class="absolute inset-0 flex items-center justify-center text-xs text-gray-400 border-2 border-dashed border-gray-300 transition duration-200 group-hover:scale-105"
+          >
+            [ placeholder: {{ recurso.imagem }} ]
+          </div>
+          <div class="relative p-4 bg-gradient-to-t from-black/70 to-transparent">
+            <h3 class="font-bold text-white">{{ recurso.title }}</h3>
+            <p class="mt-1 text-sm text-gray-200">{{ recurso.description }}</p>
+          </div>
+        </article>
+      </div>
     </section>
   </main>
 
-  <footer id="sobre" class="px-6 py-10 sm:px-10 bg-slate-900 text-white">
-    <div class="flex flex-col items-center md:flex-row md:justify-between gap-6">
-      <img :src="logo" alt="Norte Data" class="h-10 brightness-0 invert" />
-
-      <p class="text-center text-sm text-slate-400 md:text-center">
-        Norte Data© &mdash; Todos os direitos reservados.
-      </p>
-
-    </div>
-  </footer>
+    <Footer />
 </template>
 
 <script setup>
-import logo from '../assets/logo/nortedata_logoenome.png'
+import { useRouter } from 'vue-router'
+import logo from '../assets/logo/nortedata_logoenome-semfundo.png'
+import Footer from './layout/Footer.vue'
+//import logo2 from'../assets/logo/nortedata_logosemfundo.png'
+
+const router = useRouter()
 
 const cards = [
   {
@@ -99,9 +105,35 @@ const cards = [
   },
 ]
 
+const recursos = [
+  {
+    title: 'Upload automático',
+    description: 'Envie a planilha direto na plataforma, sem tratamento manual antes.',
+    imagem: 'upload.png',
+  },
+  {
+    title: 'Padronização de dados',
+    description: 'Corrige inconsistências de digitação e unifica os valores da base.',
+    imagem: 'padronizacao.png',
+  },
+  {
+    title: 'Dashboards interativos',
+    description: 'Gráficos de segmento, faturamento e nível de clientes em tempo real.',
+    imagem: 'dashboards.png',
+  },
+  {
+    title: 'Insights estratégicos',
+    description: 'Respostas rápidas para as perguntas de negócio mais importantes.',
+    imagem: 'insights.png',
+  },
+]
+
 function acessarSistema() {
-  // quando o vue-router estiver configurado,
-  // isso vira um router.push('/login')
+  // a tela de login ainda não existe, então isso continua um placeholder
   console.log('ir para login')
+}
+
+function irParaCadastro() {
+  router.push('/cadastro')
 }
 </script>

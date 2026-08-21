@@ -1,7 +1,6 @@
 <template>
-  <LandingPage />
+  <router-view />
 </template>
 
 <script setup>
-import LandingPage from './components/LandingPage.vue'
 </script>

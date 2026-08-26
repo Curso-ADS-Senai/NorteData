@@ -129,8 +129,7 @@ const recursos = [
 ]
 
 function acessarSistema() {
-  // a tela de login ainda não existe, então isso continua um placeholder
-  console.log('ir para login')
+  router.push('/login')
 }
 
 function irParaCadastro() {

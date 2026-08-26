@@ -35,7 +35,6 @@
             placeholder="Empresa S.A."
             class="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded"
           />
-          <span class="absolute inset-y-0 right-3 flex items-center text-gray-300">[icone]</span>
         </div>
       </div>
 
@@ -47,8 +46,7 @@
             type="email"
             placeholder="contato@empresa.com.br"
             class="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded"
-          />
-          <span class="absolute inset-y-0 right-3 flex items-center text-gray-300">[icone]</span>
+          />        
         </div>
       </div>
 
@@ -112,7 +110,7 @@
 
       <p class="text-center text-sm text-gray-600 sm:col-span-2">
         Já tem uma conta?
-        <a href="#" class="font-semibold text-red-600 hover:text-red-700">Entrar</a>
+        <a href="#" @click.prevent="voltarLogin" class="font-semibold text-red-600 hover:text-red-700">Entrar</a>
       </p>
     </form>
     </main>
@@ -139,6 +137,10 @@ function voltarLandingPage() {
   router.push('/')
 }
 
+function voltarLogin() {
+  router.push('/login')
+}
+
 function atualizarNome(e) {
   const filtrado = e.target.value.replace(/[0-9]/g, '')
   e.target.value = filtrado
@@ -160,7 +162,7 @@ function atualizarTelefone(e) {
 
   e.target.value = numeros
   telefone.value = numeros
-git}
+}
 
 function criarConta() {
   // quando o back-end estiver configurado,

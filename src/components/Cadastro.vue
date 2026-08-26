@@ -1,5 +1,6 @@
 <template>
-  <main class="px-6 pt-10 pb-16 sm:px-10">
+  <div class="flex flex-col min-h-screen">
+    <main class="flex-1 px-6 pt-10 pb-16 sm:px-10">
     <div class="flex flex-col items-center text-center">
       <div class="flex items-center gap-4">
         <button type="button" @click="voltarLandingPage" class="cursor-pointer">
@@ -18,9 +19,10 @@
             id="nome"
             type="text"
             placeholder="João da Silva"
-            class="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded"
+            :value="nome"
+            @input="atualizarNome"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded"
           />
-          <span class="absolute inset-y-0 right-3 flex items-center text-gray-300">[icone]</span>
         </div>
       </div>
 
@@ -56,10 +58,12 @@
           <input
             id="telefone"
             type="tel"
+            inputmode="numeric"
             placeholder="(11) 98765-4321"
-            class="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded"
+            :value="telefone"
+            @input="atualizarTelefone"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded"
           />
-          <span class="absolute inset-y-0 right-3 flex items-center text-gray-300">[icone]</span>
         </div>
       </div>
 
@@ -74,9 +78,9 @@
           <button
             type="button"
             @click="mostrarSenha = !mostrarSenha"
-            class="absolute inset-y-0 right-3 flex items-center text-gray-500 cursor-pointer"
+            class="absolute inset-y-0 right-3 flex items-center cursor-pointer"
           >
-            {{ mostrarSenha ? '🙈' : '👁️' }}
+            <img :src="mostrarSenha ? iconeEsconderSenha : iconeMostrarSenha" alt="" class="h-5 w-5" />
           </button>
         </div>
       </div>
@@ -92,9 +96,9 @@
           <button
             type="button"
             @click="mostrarConfirmarSenha = !mostrarConfirmarSenha"
-            class="absolute inset-y-0 right-3 flex items-center text-gray-500 cursor-pointer"
+            class="absolute inset-y-0 right-3 flex items-center cursor-pointer"
           >
-            {{ mostrarConfirmarSenha ? '🙈' : '👁️' }}
+            <img :src="mostrarConfirmarSenha ? iconeEsconderSenha : iconeMostrarSenha" alt="" class="h-5 w-5" />
           </button>
         </div>
       </div>
@@ -111,24 +115,52 @@
         <a href="#" class="font-semibold text-red-600 hover:text-red-700">Entrar</a>
       </p>
     </form>
-  </main>
+    </main>
 
-  <Footer />
+    <Footer />
+  </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import logo3 from '../assets/logo/nortedata_logosemfundo.png'
+import iconeMostrarSenha from '../assets/logo/mostrar-senha.png'
+import iconeEsconderSenha from '../assets/logo/esconder-senha.png'
 import Footer from './layout/Footer.vue'
 
 const router = useRouter()
 const mostrarSenha = ref(false)
 const mostrarConfirmarSenha = ref(false)
+const nome = ref('')
+const telefone = ref('')
 
 function voltarLandingPage() {
   router.push('/')
 }
+
+function atualizarNome(e) {
+  const filtrado = e.target.value.replace(/[0-9]/g, '')
+  e.target.value = filtrado
+  nome.value = filtrado
+}
+
+function atualizarTelefone(e) {
+  let numeros = e.target.value.replace(/\D/g, '').slice(0, 11)
+
+  if (numeros.length > 10) {
+    numeros = numeros.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3')
+  } else if (numeros.length > 6) {
+    numeros = numeros.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3')
+  } else if (numeros.length > 2) {
+    numeros = numeros.replace(/^(\d{2})(\d{0,5})/, '($1) $2')
+  } else if (numeros.length > 0) {
+    numeros = numeros.replace(/^(\d*)/, '($1')
+  }
+
+  e.target.value = numeros
+  telefone.value = numeros
+git}
 
 function criarConta() {
   // quando o back-end estiver configurado,

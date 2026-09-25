@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Docs internos (não versionar)
+CLAUDE.md
+pinia.txt
+PROJETO_INTEGRADOR.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

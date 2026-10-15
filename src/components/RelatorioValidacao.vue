@@ -69,6 +69,57 @@
       <section class="p-5 mt-4 bg-white rounded-lg border border-gray-200 shadow-sm">
         <button
           type="button"
+          @click="mostrarDadosTratados = !mostrarDadosTratados"
+          class="flex w-full items-center justify-between text-left cursor-pointer"
+        >
+          <h2 class="font-bold text-slate-900">Prévia dos Dados Tratados</h2>
+          <svg
+            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            class="h-5 w-5 text-gray-500 transition-transform"
+            :class="{ 'rotate-180': mostrarDadosTratados }"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+
+        <template v-if="mostrarDadosTratados">
+          <p class="mt-1 text-sm text-gray-500">
+            Versão da planilha já com segmento e nível padronizados (ex: "IND." → "Indústria"). A planilha original não é alterada.
+          </p>
+
+          <div class="flex gap-4 mt-4 text-sm">
+            <p class="text-slate-900">Total de clientes: <span class="font-semibold">{{ store.totalClientes }}</span></p>
+            <p class="text-slate-900">Nível A: <span class="font-semibold">{{ store.clientesPorNivel.A }}</span></p>
+            <p class="text-slate-900">Nível B: <span class="font-semibold">{{ store.clientesPorNivel.B }}</span></p>
+            <p class="text-slate-900">Nível C: <span class="font-semibold">{{ store.clientesPorNivel.C }}</span></p>
+          </div>
+
+          <div class="overflow-x-auto mt-4">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-gray-500 border-b border-gray-200">
+                  <th class="py-2 pr-4 font-medium">Linha</th>
+                  <th v-for="campo in colunasPlanilha" :key="campo" class="py-2 pr-4 font-medium">
+                    {{ CAMPOS_LABELS[campo] ?? campo }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="linha in store.dadosTratados" :key="linha._linha" class="border-b border-gray-100 last:border-0">
+                  <td class="py-2 pr-4 text-gray-600">{{ linha._linha }}</td>
+                  <td v-for="campo in colunasPlanilha" :key="campo" class="py-2 pr-4 text-slate-900">
+                    {{ formatarValor(linha[campo]) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+      </section>
+
+      <section class="p-5 mt-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+        <button
+          type="button"
           @click="mostrarErrosPorTipo = !mostrarErrosPorTipo"
           class="flex w-full items-center justify-between text-left cursor-pointer"
         >
@@ -163,6 +214,7 @@ const router = useRouter()
 const store = useValidacaoPlanilhaStore()
 
 const filtroTipo = ref('')
+const mostrarDadosTratados = ref(false)
 const mostrarErrosPorTipo = ref(false)
 const mostrarDetalhamento = ref(false)
 

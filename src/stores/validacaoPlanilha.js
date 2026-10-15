@@ -79,6 +79,9 @@ export const useValidacaoPlanilhaStore = defineStore('validacaoPlanilha', {
   state: () => ({
     nomeArquivo: '',
     linhas: [],
+    // Versão corrigida/padronizada de "linhas", gerada por tratarDados().
+    // Fica separada da planilha bruta para a tela poder exibir "antes x depois".
+    dadosTratados: [],
     erros: [],
     status: 'idle', // idle | processando | concluido | erro
     erroTemplate: '',
@@ -103,6 +106,25 @@ export const useValidacaoPlanilhaStore = defineStore('validacaoPlanilha', {
         return contagem
       }, {})
     },
+
+    // Total de clientes já tratados (equivalente ao "totalClientes" da Aula 09).
+    totalClientes: (state) => state.dadosTratados.length,
+
+    // Quantos clientes (já tratados) caem em cada nível A/B/C.
+    // Equivalente ao "clientesNivelA" da Aula 09, mas cobre os 3 níveis de uma vez
+    // para não precisar de um getter repetido por nível.
+    clientesPorNivel: (state) => {
+      return state.dadosTratados.reduce(
+        (contagem, linha) => {
+          const nivel = linha.nivel_cliente
+          if (NIVEIS_VALIDOS.includes(nivel)) {
+            contagem[nivel] += 1
+          }
+          return contagem
+        },
+        { A: 0, B: 0, C: 0 }
+      )
+    },
   },
 
   actions: {
@@ -115,8 +137,16 @@ export const useValidacaoPlanilhaStore = defineStore('validacaoPlanilha', {
       this.status = 'processando'
       this.nomeArquivo = file.name
 
-      const buffer = await file.arrayBuffer()
-      const planilha = XLSX.read(buffer, { type: 'array', cellDates: true })
+      let planilha
+      try {
+        const buffer = await file.arrayBuffer()
+        planilha = XLSX.read(buffer, { type: 'array', cellDates: true })
+      } catch (erro) {
+        this.status = 'erro'
+        this.erroTemplate = `Não foi possível ler o arquivo. Verifique se ele não está corrompido ou em um formato inválido. (${erro.message})`
+        return
+      }
+
       const primeiraAba = planilha.Sheets[planilha.SheetNames[0]]
 
       const cabecalho = (XLSX.utils.sheet_to_json(primeiraAba, { header: 1 })[0] || []).map((c) =>
@@ -134,7 +164,40 @@ export const useValidacaoPlanilhaStore = defineStore('validacaoPlanilha', {
       this.linhas = linhasBrutas.map((linha, indice) => ({ ...linha, _linha: indice + 2 }))
 
       this.validarLinhas()
+      this.tratarDados()
       this.status = 'concluido'
+    },
+
+    // Recebe uma linha bruta da planilha e devolve uma CÓPIA com os valores
+    // já corrigidos — a planilha original (this.linhas) nunca é alterada.
+    // Hoje só padroniza "segmento" e "nivel_cliente", que são os campos com
+    // mapa de correção conhecido (SEGMENTOS_PADRAO / NIVEIS_VALIDOS).
+    tratarLinha(linha) {
+      const linhaTratada = { ...linha }
+
+      const segmento = String(linha.segmento ?? '').trim()
+      if (segmento !== '') {
+        const chave = normalizarChave(segmento)
+        const segmentoPadrao = SEGMENTOS_PADRAO[chave]
+        // Se o segmento já bate com um valor do mapa (ex: "ind.", "industria"),
+        // troca pela grafia oficial. Senão, mantém o valor como veio.
+        linhaTratada.segmento = segmentoPadrao ?? segmento
+      }
+
+      const nivel = String(linha.nivel_cliente ?? '').trim().toUpperCase()
+      if (nivel !== '') {
+        linhaTratada.nivel_cliente = nivel
+      }
+
+      return linhaTratada
+    },
+
+    // Gera dadosTratados aplicando tratarLinha em cada registro de "linhas".
+    // Chamado depois de validarLinhas() para que o relatório de erros (que
+    // aponta o desvio) e a prévia tratada (que mostra a correção) fiquem
+    // sempre consistentes entre si.
+    tratarDados() {
+      this.dadosTratados = this.linhas.map((linha) => this.tratarLinha(linha))
     },
 
     validarLinhas() {
@@ -237,6 +300,7 @@ export const useValidacaoPlanilhaStore = defineStore('validacaoPlanilha', {
     resetar() {
       this.nomeArquivo = ''
       this.linhas = []
+      this.dadosTratados = []
       this.erros = []
       this.status = 'idle'
       this.erroTemplate = ''

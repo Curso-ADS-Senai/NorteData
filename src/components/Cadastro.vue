@@ -45,8 +45,10 @@
             id="email"
             type="email"
             placeholder="contato@empresa.com.br"
+            :value="email"
+            @input="email = $event.target.value"
             class="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded"
-          />        
+          />
         </div>
       </div>
 
@@ -71,6 +73,8 @@
           <input
             id="senha"
             :type="mostrarSenha ? 'text' : 'password'"
+            :value="senha"
+            @input="senha = $event.target.value"
             class="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded"
           />
           <button
@@ -89,6 +93,8 @@
           <input
             id="confirmar-senha"
             :type="mostrarConfirmarSenha ? 'text' : 'password'"
+            :value="confirmarSenha"
+            @input="confirmarSenha = $event.target.value"
             class="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded"
           />
           <button
@@ -101,11 +107,16 @@
         </div>
       </div>
 
+      <div v-if="erro" class="p-4 bg-red-50 rounded-lg border border-red-200 sm:col-span-2">
+        <p class="text-sm text-red-600">{{ erro }}</p>
+      </div>
+
       <button
         type="submit"
-        class="mt-2 px-8 py-3 font-semibold bg-red-600 text-white rounded transition hover:bg-red-700 cursor-pointer sm:col-span-2"
+        :disabled="enviando"
+        class="mt-2 px-8 py-3 font-semibold bg-red-600 text-white rounded transition hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer sm:col-span-2"
       >
-        Criar Conta
+        {{ enviando ? 'Criando conta...' : 'Criar Conta' }}
       </button>
 
       <p class="text-center text-sm text-gray-600 sm:col-span-2">
@@ -126,12 +137,18 @@ import logo3 from '../assets/logo/nortedata_logosemfundo.png'
 import iconeMostrarSenha from '../assets/logo/mostrar-senha.png'
 import iconeEsconderSenha from '../assets/logo/esconder-senha.png'
 import Footer from './layout/Footer.vue'
+import { criarConsultor } from '../services/consultores.js'
 
 const router = useRouter()
 const mostrarSenha = ref(false)
 const mostrarConfirmarSenha = ref(false)
 const nome = ref('')
 const telefone = ref('')
+const email = ref('')
+const senha = ref('')
+const confirmarSenha = ref('')
+const enviando = ref(false)
+const erro = ref('')
 
 function voltarLandingPage() {
   router.push('/')
@@ -164,9 +181,24 @@ function atualizarTelefone(e) {
   telefone.value = numeros
 }
 
-function criarConta() {
-  // quando o back-end estiver configurado,
-  // isso envia os dados do formulário
-  console.log('criar conta')
+async function criarConta() {
+  erro.value = ''
+
+  if (senha.value !== confirmarSenha.value) {
+    erro.value = 'As senhas não coincidem.'
+    return
+  }
+
+  enviando.value = true
+  try {
+    // O backend (Consultor) só modela nome/email/senha — empresa e telefone
+    // ficam só na UI até o modelo do back-end incluir esses campos.
+    await criarConsultor({ nome: nome.value, email: email.value, senha: senha.value })
+    router.push('/login')
+  } catch (e) {
+    erro.value = e.response?.data?.message ?? 'Não foi possível criar a conta. Tente novamente.'
+  } finally {
+    enviando.value = false
+  }
 }
 </script>

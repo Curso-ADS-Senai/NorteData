@@ -16,6 +16,9 @@ dist-ssr
 CLAUDE.md
 pinia.txt
 PROJETO_INTEGRADOR.md
+GAP_*.md
+src/services/README_FUTURO_BACKEND.md
+src/services/STATUS_INTEGRACAO_BACKEND.md
 
 # Editor directories and files
 .vscode/*

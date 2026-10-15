@@ -2,7 +2,7 @@
   <div class="flex min-h-screen bg-gray-50">
     <Sidebar />
 
-    <div class="flex-1 min-w-0">
+    <div class="flex-1 min-w-0 transition-all duration-200" :class="ui.sidebarColapsada ? 'ml-20' : 'ml-64'">
       <main class="px-8 pt-8 pb-10">
         <slot />
       </main>
@@ -12,4 +12,7 @@
 
 <script setup>
 import Sidebar from './Sidebar.vue'
+import { useUiStore } from '../../stores/ui.js'
+
+const ui = useUiStore()
 </script>

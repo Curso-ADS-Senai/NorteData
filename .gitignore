@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+*.env
 
 # Docs internos (não versionar)
 CLAUDE.md

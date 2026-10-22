@@ -62,6 +62,10 @@
           <a href="#" class="font-semibold text-red-600 hover:text-red-700">Esqueci minha senha</a>
         </div>
 
+        <div v-if="erro" class="p-4 bg-red-50 rounded-lg border border-red-200">
+          <p class="text-sm text-red-600">{{ erro }}</p>
+        </div>
+
         <button
           type="submit"
           class="px-8 py-3 font-semibold bg-red-600 text-white rounded transition hover:bg-red-700 cursor-pointer"
@@ -87,12 +91,15 @@ import logo3 from '../assets/logo/nortedata_logosemfundo.png'
 import iconeMostrarSenha from '../assets/logo/mostrar-senha.png'
 import iconeEsconderSenha from '../assets/logo/esconder-senha.png'
 import Footer from './layout/Footer.vue'
+import { useAuthStore } from '../stores/auth.js'
 
 const router = useRouter()
+const auth = useAuthStore()
 const mostrarSenha = ref(false)
 const email = ref('')
 const senha = ref('')
 const lembrarMe = ref(false)
+const erro = ref('')
 
 function voltarLandingPage() {
   router.push('/')
@@ -102,10 +109,14 @@ function irParaCadastro() {
   router.push('/cadastro')
 }
 
-function entrar() {
-  // quando o back-end estiver configurado,
-  // isso envia as credenciais do formulário
-  console.log('entrar', { email: email.value, senha: senha.value, lembrarMe: lembrarMe.value })
-  router.push('/dashboard')
+async function entrar() {
+  erro.value = ''
+
+  try {
+    await auth.login(email.value, senha.value)
+    router.push('/dashboard')
+  } catch (e) {
+    erro.value = e.response?.data?.message ?? 'E-mail ou senha inválidos.'
+  }
 }
 </script>

@@ -137,7 +137,9 @@ import logo3 from '../assets/logo/nortedata_logosemfundo.png'
 import iconeMostrarSenha from '../assets/logo/mostrar-senha.png'
 import iconeEsconderSenha from '../assets/logo/esconder-senha.png'
 import Footer from './layout/Footer.vue'
-import { criarConsultor } from '../services/consultores.js'
+import { useAuthStore } from '../stores/auth.js'
+
+const auth = useAuthStore()
 
 const router = useRouter()
 const mostrarSenha = ref(false)
@@ -191,9 +193,9 @@ async function criarConta() {
 
   enviando.value = true
   try {
-    // O backend (Consultor) só modela nome/email/senha — empresa e telefone
+    // O backend (Usuario) só modela nome/email/senha — empresa e telefone
     // ficam só na UI até o modelo do back-end incluir esses campos.
-    await criarConsultor({ nome: nome.value, email: email.value, senha: senha.value })
+    await auth.cadastrar(nome.value, email.value, senha.value)
     router.push('/login')
   } catch (e) {
     erro.value = e.response?.data?.message ?? 'Não foi possível criar a conta. Tente novamente.'

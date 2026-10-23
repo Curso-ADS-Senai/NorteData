@@ -7,6 +7,7 @@ import UploadPlanilha from '../components/UploadPlanilha.vue'
 import RelatorioValidacao from '../components/RelatorioValidacao.vue'
 import {useAuthStore} from '../stores/auth'
 import Consultores from '../components/Consultores.vue'
+import Usuarios from '../components/Usuarios.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -18,6 +19,7 @@ const router = createRouter({
     { path: '/upload', name: 'upload', component: UploadPlanilha,  meta: { privado: true }},
     { path: '/relatorio-validacao', name: 'relatorio-validacao', component: RelatorioValidacao, meta: { privado: true }},
     { path: '/consultores', name: 'consultores', component: Consultores, meta: { privado: true }},
+    { path: '/usuarios', name: 'usuarios', component: Usuarios, meta: { privado: true, admin: true }},
   ],
 })
 

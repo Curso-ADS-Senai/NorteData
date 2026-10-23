@@ -21,7 +21,7 @@
 
     <nav class="flex flex-col flex-1 gap-1 px-4 py-6">
       <router-link
-        v-for="item in itens"
+        v-for="item in itensVisiveis"
         :key="item.to"
         :to="item.to"
         :title="item.label"
@@ -64,16 +64,38 @@
       </span>
       <span v-if="!ui.sidebarColapsada">Meu Perfil</span>
     </router-link>
+
+    <button
+      type="button"
+      @click="sair"
+      title="Sair"
+      class="flex items-center gap-3 px-4 py-4 border-t border-slate-800 text-sm font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white cursor-pointer"
+      :class="ui.sidebarColapsada ? 'justify-center' : ''"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-5 w-5 shrink-0">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17l5-5-5-5M20 12H9M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7" />
+      </svg>
+      <span v-if="!ui.sidebarColapsada">Sair</span>
+    </button>
   </aside>
 </template>
 
 <script setup>
-import { h } from 'vue'
+import { h, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUiStore } from '../../stores/ui.js'
+import { useAuthStore } from '../../stores/auth.js'
 import logoCompleto from '../../assets/logo/nortedata_logoenome-semfundo.png'
 import logoIcone from '../../assets/logo/nortedata_logosemfundo.png'
 
 const ui = useUiStore()
+const auth = useAuthStore()
+const router = useRouter()
+
+function sair() {
+  auth.logout()
+  router.push('/login')
+}
 
 function icone(path) {
   return () =>
@@ -91,5 +113,10 @@ const itens = [
   { label: 'Configurações', to: '/configuracoes', icone: icone('M10.3 3h3.4l.6 2.6a7.9 7.9 0 0 1 2 1.2l2.6-.8 1.7 3-2 1.8a8 8 0 0 1 0 2.4l2 1.8-1.7 3-2.6-.8a7.9 7.9 0 0 1-2 1.2L13.7 21h-3.4l-.6-2.6a7.9 7.9 0 0 1-2-1.2l-2.6.8-1.7-3 2-1.8a8 8 0 0 1 0-2.4l-2-1.8 1.7-3 2.6.8a7.9 7.9 0 0 1 2-1.2L10.3 3ZM9 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0Z') },
   { label: 'Importar Dados', to: '/upload', icone: icone('M12 4v10m0-10 4 4m-4-4-4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2') },
   { label: 'Relatório da Planilha', to: '/relatorio-validacao', icone: icone('M9 3h6l5 5v13H4V3h5Zm0 0v5H4m5 7h6m-6 4h6') },
+  { label: 'Usuários', to: '/usuarios', admin: true, icone: icone('M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21a6 6 0 0 1 12 0M20 8v4m-2-2h4') },
 ]
+
+const itensVisiveis = computed(() =>
+  itens.filter((item) => !item.admin || auth.usuario?.perfil === 'ADMIN')
+)
 </script>

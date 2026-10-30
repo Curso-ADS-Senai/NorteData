@@ -11,13 +11,37 @@
           <h1 class="text-2xl font-bold text-slate-900">Relatório de Validação</h1>
           <p class="mt-1 text-gray-600">Arquivo analisado: {{ store.nomeArquivo }}</p>
         </div>
-        <button
-          type="button"
-          @click="novaAnalise"
-          class="px-5 py-2 text-sm font-semibold bg-red-600 text-white rounded transition hover:bg-red-700 cursor-pointer"
-        >
-          Nova Análise
-        </button>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            :disabled="enviando || store.totalRegistrosValidos === 0"
+            @click="enviarParaBackend"
+            class="px-5 py-2 text-sm font-semibold bg-slate-900 text-white rounded transition hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {{ enviando ? 'Enviando...' : 'Enviar para o Backend' }}
+          </button>
+          <button
+            type="button"
+            @click="novaAnalise"
+            class="px-5 py-2 text-sm font-semibold bg-red-600 text-white rounded transition hover:bg-red-700 cursor-pointer"
+          >
+            Nova Análise
+          </button>
+        </div>
+      </div>
+
+      <div v-if="erroEnvio" class="p-4 mt-4 bg-red-50 rounded-lg border border-red-200">
+        <p class="text-sm text-red-600">{{ erroEnvio }}</p>
+      </div>
+
+      <div v-if="resultadoEnvio" class="p-4 mt-4 bg-green-50 rounded-lg border border-green-200">
+        <p class="text-sm font-semibold text-green-700">Planilha enviada ({{ resultadoEnvio.status }})</p>
+        <p class="mt-1 text-sm text-green-700">
+          {{ resultadoEnvio.linhasValidas }} linha(s) processada(s) de {{ resultadoEnvio.totalLinhas }}.
+        </p>
+        <ul v-if="resultadoEnvio.rejeitadas?.length" class="mt-2 ml-4 text-sm text-green-700 list-disc">
+          <li v-for="(rejeitada, indice) in resultadoEnvio.rejeitadas" :key="indice">{{ rejeitada }}</li>
+        </ul>
       </div>
 
       <section class="grid gap-4 mt-6 sm:grid-cols-3">
@@ -209,6 +233,8 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AppLayout from './layout/AppLayout.vue'
 import { useValidacaoPlanilhaStore, TIPOS_ERRO_LABELS, CAMPOS_LABELS } from '../stores/validacaoPlanilha.js'
+import { enviarPlanilhaValidada } from '../services/uploads.js'
+import { extrairMensagemErro } from '../services/api.js'
 
 const router = useRouter()
 const store = useValidacaoPlanilhaStore()
@@ -217,6 +243,9 @@ const filtroTipo = ref('')
 const mostrarDadosTratados = ref(false)
 const mostrarErrosPorTipo = ref(false)
 const mostrarDetalhamento = ref(false)
+const enviando = ref(false)
+const erroEnvio = ref('')
+const resultadoEnvio = ref(null)
 
 const tiposComErro = computed(() => Object.keys(store.errosPorTipo))
 
@@ -246,5 +275,24 @@ const errosFiltrados = computed(() =>
 function novaAnalise() {
   store.resetar()
   router.push('/upload')
+}
+
+async function enviarParaBackend() {
+  enviando.value = true
+  erroEnvio.value = ''
+  resultadoEnvio.value = null
+
+  try {
+    const { data } = await enviarPlanilhaValidada({
+      arquivoNome: store.nomeArquivo,
+      linhasValidas: store.linhasValidasTratadas,
+      descartadas: store.totalRegistrosComErro,
+    })
+    resultadoEnvio.value = data
+  } catch (e) {
+    erroEnvio.value = extrairMensagemErro(e, 'Não foi possível enviar a planilha para o backend.')
+  } finally {
+    enviando.value = false
+  }
 }
 </script>

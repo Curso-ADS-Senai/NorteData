@@ -138,6 +138,7 @@ import iconeMostrarSenha from '../assets/logo/mostrar-senha.png'
 import iconeEsconderSenha from '../assets/logo/esconder-senha.png'
 import Footer from './layout/Footer.vue'
 import { useAuthStore } from '../stores/auth.js'
+import { extrairMensagemErro } from '../services/api.js'
 
 const auth = useAuthStore()
 
@@ -198,7 +199,7 @@ async function criarConta() {
     await auth.cadastrar(nome.value, email.value, senha.value)
     router.push('/login')
   } catch (e) {
-    erro.value = e.response?.data?.message ?? 'Não foi possível criar a conta. Tente novamente.'
+    erro.value = extrairMensagemErro(e, 'Não foi possível criar a conta. Tente novamente.')
   } finally {
     enviando.value = false
   }

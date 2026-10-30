@@ -19,7 +19,7 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async cadastrar(nome, email, senha) {
-      const { data } = await api.post('/api/auth/cadastro', { nome, email, senha })
+      const { data } = await api.post('/api/auth/register', { nome, email, senha })
       return data
     },
 

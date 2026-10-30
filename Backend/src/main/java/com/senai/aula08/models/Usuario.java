@@ -22,6 +22,10 @@ public class Usuario {
     @Column(nullable = false, length = 20)
     private Perfil perfil = Perfil.USER;
 
+    @Enumerated(EnumType.STRING) // Guarda PENDENTE/ATIVO/BLOQUEADO como texto no PostgreSQL.
+    @Column(nullable = false, length = 20)
+    private StatusUsuario status = StatusUsuario.PENDENTE;
+
     public Usuario() {} // Construtor exigido pelo JPA.
 
     public Long getId() { return id; }
@@ -33,4 +37,6 @@ public class Usuario {
     public void setSenhaHash(String senhaHash) { this.senhaHash = senhaHash; }
     public Perfil getPerfil() { return perfil; }
     public void setPerfil(Perfil perfil) { this.perfil = perfil; }
+    public StatusUsuario getStatus() { return status; }
+    public void setStatus(StatusUsuario status) { this.status = status; }
 }

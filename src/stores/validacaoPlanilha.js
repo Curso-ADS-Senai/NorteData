@@ -125,6 +125,29 @@ export const useValidacaoPlanilhaStore = defineStore('validacaoPlanilha', {
         { A: 0, B: 0, C: 0 }
       )
     },
+
+    // Quantos clientes (já tratados) caem em cada segmento padronizado.
+    clientesPorSegmento: (state) => {
+      return state.dadosTratados.reduce((contagem, linha) => {
+        const segmento = linha.segmento
+        if (segmento) {
+          contagem[segmento] = (contagem[segmento] || 0) + 1
+        }
+        return contagem
+      }, {})
+    },
+
+    // Linhas brutas que não têm nenhum erro registrado — útil para o próximo
+    // passo de enviar só os registros válidos ao backend.
+    linhasValidas() {
+      return this.linhas.filter((linha) => !this.linhasComErro.has(linha._linha))
+    },
+
+    // Mesmas linhas de linhasValidas, mas já com segmento/nível padronizados
+    // (tratarLinha) — é essa versão que vai pro backend em enviarPlanilhaValidada.
+    linhasValidasTratadas() {
+      return this.dadosTratados.filter((linha) => !this.linhasComErro.has(linha._linha))
+    },
   },
 
   actions: {
@@ -252,13 +275,22 @@ export const useValidacaoPlanilhaStore = defineStore('validacaoPlanilha', {
         }
 
         const faturamento = linha.faturamento_anual
-        if (faturamento !== '' && faturamento !== null && faturamento !== undefined && !ehNumerico(faturamento)) {
-          this.registrarErro(
-            numeroLinha,
-            'faturamento_anual',
-            'fora_padrao',
-            `Faturamento "${faturamento}" não é um valor numérico válido.`
-          )
+        if (faturamento !== '' && faturamento !== null && faturamento !== undefined) {
+          if (!ehNumerico(faturamento)) {
+            this.registrarErro(
+              numeroLinha,
+              'faturamento_anual',
+              'fora_padrao',
+              `Faturamento "${faturamento}" não é um valor numérico válido.`
+            )
+          } else if (Number(String(faturamento).trim().replace(/\./g, '').replace(',', '.')) < 0) {
+            this.registrarErro(
+              numeroLinha,
+              'faturamento_anual',
+              'fora_padrao',
+              `Faturamento "${faturamento}" não pode ser negativo.`
+            )
+          }
         }
 
         const dataContratacao = linha.data_contratacao

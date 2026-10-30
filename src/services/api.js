@@ -21,4 +21,10 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Respostas de erro do backend vêm como { erro: "mensagem", campos: {...} }.
+// Centraliza a leitura desse envelope para não duplicar o fallback em cada tela.
+export function extrairMensagemErro(erro, mensagemPadrao) {
+  return erro.response?.data?.erro ?? mensagemPadrao
+}
+
 export default api

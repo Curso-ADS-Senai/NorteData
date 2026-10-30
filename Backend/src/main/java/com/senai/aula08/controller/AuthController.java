@@ -22,7 +22,7 @@ public class AuthController {
         this.repository = repository;
     }
 
-    @PostMapping("/auth/cadastro")
+    @PostMapping("/auth/register")
     @ResponseStatus(HttpStatus.CREATED)
     public UsuarioResponse cadastrar(@Valid @RequestBody CadastroRequest dados) {
         return service.cadastrar(dados); // Controller delega a regra ao Service.

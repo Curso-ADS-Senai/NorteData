@@ -92,6 +92,7 @@ import iconeMostrarSenha from '../assets/logo/mostrar-senha.png'
 import iconeEsconderSenha from '../assets/logo/esconder-senha.png'
 import Footer from './layout/Footer.vue'
 import { useAuthStore } from '../stores/auth.js'
+import { extrairMensagemErro } from '../services/api.js'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -116,7 +117,7 @@ async function entrar() {
     await auth.login(email.value, senha.value)
     router.push('/dashboard')
   } catch (e) {
-    erro.value = e.response?.data?.message ?? 'E-mail ou senha inválidos.'
+    erro.value = extrairMensagemErro(e, 'E-mail ou senha inválidos.')
   }
 }
 </script>

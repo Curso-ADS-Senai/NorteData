@@ -2,6 +2,7 @@ package com.senai.aula08.service;
 
 import com.senai.aula08.dto.*;
 import com.senai.aula08.models.Perfil;
+import com.senai.aula08.models.StatusUsuario;
 import com.senai.aula08.models.Usuario;
 import com.senai.aula08.repository.UsuarioRepository;
 import com.senai.aula08.security.JwtService;
@@ -38,6 +39,7 @@ public class AuthService {
         usuario.setEmail(email);
         usuario.setSenhaHash(encoder.encode(dados.senha())); // Armazena apenas o hash.
         usuario.setPerfil(Perfil.USER); // Cadastro público nunca define ADMIN.
+        usuario.setStatus(StatusUsuario.PENDENTE); // Só entra depois de um admin aprovar.
         return UsuarioResponse.de(repository.save(usuario));
     }
 
@@ -47,6 +49,12 @@ public class AuthService {
         // Mesmo erro para usuário inexistente e senha inválida.
         if (usuario == null || !encoder.matches(dados.senha(), usuario.getSenhaHash())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "E-mail ou senha inválidos");
+        }
+        if (usuario.getStatus() == StatusUsuario.PENDENTE) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cadastro pendente de aprovação do administrador.");
+        }
+        if (usuario.getStatus() == StatusUsuario.BLOQUEADO) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário bloqueado. Contate o administrador.");
         }
         return new LoginResponse(jwt.gerar(usuario), "Bearer", UsuarioResponse.de(usuario));
     }

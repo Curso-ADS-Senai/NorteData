@@ -36,10 +36,8 @@
         </button>
       </div>
 
-      <div
-        class="flex items-center justify-center aspect-video bg-gray-50 text-gray-400 rounded-lg border-2 border-dashed border-gray-300"
-      >
-        [ placeholder: preview do dashboard ]
+      <div class="flex items-center justify-center">
+        <img :src="dashboardPreview" alt="Prévia do dashboard Norte Data" class="w-full max-w-xl" />
       </div>
     </section>
 
@@ -82,6 +80,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import logo from '../assets/logo/nortedata_logoenome-semfundo.png'
+import dashboardPreview from '../assets/dashboard-preview.png'
 import Footer from './layout/Footer.vue'
 //import logo2 from'../assets/logo/nortedata_logosemfundo.png'
 

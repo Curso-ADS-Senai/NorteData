@@ -51,6 +51,20 @@ public class Cliente {
     @Column(name="status",nullable = false)
     private StatusCliente status;
 
+    // Lote de origem: só clientes importados de planilha têm; cadastro manual via CRUD fica null
+    @ManyToOne
+    @JoinColumn(name = "id_lote", nullable = true)
+    private UploadLote lote;
+
+    @Column(name = "codigo_cliente", length = 50)
+    private String codigoCliente;
+
+    @Column(name = "cidade", length = 100)
+    private String cidade;
+
+    @Column(name = "uf", length = 2)
+    private String uf;
+
     // Cria um construtor vazio para cliente
 
     public Cliente(){
@@ -135,6 +149,38 @@ public StatusCliente getStatus(){
 
 public void setStatus(StatusCliente status){
     this.status = status;
+}
+
+public UploadLote getLote(){
+    return lote;
+}
+
+public void setLote(UploadLote lote){
+    this.lote = lote;
+}
+
+public String getCodigoCliente(){
+    return codigoCliente;
+}
+
+public void setCodigoCliente(String codigoCliente){
+    this.codigoCliente = codigoCliente;
+}
+
+public String getCidade(){
+    return cidade;
+}
+
+public void setCidade(String cidade){
+    this.cidade = cidade;
+}
+
+public String getUf(){
+    return uf;
+}
+
+public void setUf(String uf){
+    this.uf = uf;
 }
 
 

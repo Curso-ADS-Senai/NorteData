@@ -24,4 +24,32 @@ public class Servico {
     @Column (name = "valor", nullable = false, precision = 15, scale=2)
     private  BigDecimal valor;
 
+    public Servico(){
+    }
+
+    public Servico(String descricao, BigDecimal valor){
+        this.descricao = descricao;
+        this.valor = valor;
+    }
+
+    public Long getIdServico(){
+        return idServico;
+    }
+
+    public String getDescricao(){
+        return descricao;
+    }
+
+    public void setDescricao(String descricao){
+        this.descricao = descricao;
+    }
+
+    public BigDecimal getValor(){
+        return valor;
+    }
+
+    public void setValor(BigDecimal valor){
+        this.valor = valor;
+    }
+
 }

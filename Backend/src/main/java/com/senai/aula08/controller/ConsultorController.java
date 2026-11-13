@@ -43,16 +43,11 @@ public Consultor criar(
 
 
 
-// =====
-// LOGIN
-//
-
-@PostMapping("/login")
-public Consultor login(@RequestBody Consultor consultor){
-
-    return service.login(consultor.getEmail(), consultor.getSenha());
-
-}
+// O login de consultor foi removido: a autenticação do sistema é
+// POST /api/auth/login (Usuario + JWT). Este endpoint era inalcançável
+// (o SecurityConfig só libera /api/auth/**, então exigia um JWT para
+// fazer login) e comparava senha em texto puro. Com `senha` nullable
+// ele ainda viraria um NullPointerException.
 
 //====
 // READ

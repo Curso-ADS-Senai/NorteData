@@ -25,10 +25,16 @@ private Long idConsultor;
 @Column (name= "nome",nullable = false, length = 150)
 private  String nome;
 
-@Column (name = "email", nullable = false, unique = true, length = 150)
+// email e senha são resquício das aulas 08/09, de antes de Usuario existir —
+// a autenticação do sistema roda toda em Usuario/senhaHash, não aqui.
+// Ficaram nullable porque o ETL em Python cria consultor só com o nome que
+// vem na planilha. Ver Backend/sql/003_consultor_etl_estatistica.sql.
+@Column (name = "email", unique = true, length = 150)
 private  String email;
 
-@Column (name = "senha", nullable = false, unique = true, length = 150)
+// Sem unique: dois consultores podiam ter o mesmo hash de senha e a constraint
+// antiga barrava isso sem motivo.
+@Column (name = "senha", length = 150)
 private  String senha;
 
 @Column (name = "telefone", length = 30)

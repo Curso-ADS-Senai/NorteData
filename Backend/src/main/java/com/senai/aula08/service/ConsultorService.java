@@ -70,23 +70,8 @@ public class ConsultorService {
     }
 
 
-// Login
-
-// Cria a função
-
-public Consultor login(String email, String senha){
-
-    Consultor consultor = repository.findByEmail(email).orElseThrow(()->new RuntimeException("Consultor não encontrado"));
-
-
-    // Validação
-    if(!consultor.getSenha().equals(senha)){
-        throw new RuntimeException("Senha inválida");
-    }
-
-    return consultor;
-
-}
+// O login de consultor foi removido junto com o endpoint POST /consultores/login
+// — ver o comentário no ConsultorController. A autenticação é AuthService/Usuario.
 
 
 // READ - todos

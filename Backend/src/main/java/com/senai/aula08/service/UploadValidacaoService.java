@@ -12,8 +12,9 @@ import java.util.Locale;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 
-// Revalida o que o front (validacaoPlanilha.js) já validou e padroniza segmento/nível
-// antes de devolver JSON limpo. Mesmo escopo da Aula 13: sem banco, sem Python ainda.
+// Revalida o que o front (validacaoPlanilha.js) já validou, padroniza segmento/nível e
+// encaminha as linhas aceitas ao ETL em Python, que é quem grava no banco.
+// O Java não persiste nada do upload.
 @Service
 public class UploadValidacaoService {
     // Espelha SEGMENTOS_PADRAO de src/stores/validacaoPlanilha.js — os 7 segmentos reais
@@ -26,6 +27,12 @@ public class UploadValidacaoService {
             "tecnologia", "Tecnologia",
             "saude", "Saúde",
             "educacao", "Educação");
+
+    private final PythonEtlService etl;
+
+    public UploadValidacaoService(PythonEtlService etl) {
+        this.etl = etl;
+    }
 
     public UploadValidadoResponse validar(UploadValidadoRequest requisicao) {
         List<String> rejeitadas = new ArrayList<>();
@@ -42,6 +49,15 @@ public class UploadValidacaoService {
             }
             codigosVistos.put(chave, linha.numeroLinha());
             aceitas.add(padronizar(linha));
+        }
+
+        // Encaminha ao Python, que cria o lote e grava. Síncrono: se o ETL falhar, a exceção
+        // sobe e o usuário vê o erro na resposta do upload — nada de lote preso em PROCESSANDO.
+        // Se nada sobrou, não chama (o Python devolveria 422 e viraria erro de servidor à toa).
+        if (!aceitas.isEmpty()) {
+            int recebidas = requisicao.descartadas() + requisicao.linhas().size();
+            int invalidas = requisicao.descartadas() + rejeitadas.size();
+            etl.enviar(requisicao.arquivoNome(), recebidas, invalidas, 0, aceitas);
         }
 
         String status = rejeitadas.isEmpty() ? "OK" : "PARCIAL";

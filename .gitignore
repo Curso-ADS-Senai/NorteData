@@ -13,6 +13,12 @@ dist-ssr
 *.local
 *.env
 
+# Python (analytics-python) — o .venv tem centenas de MB e é recriado com
+# pip install -r requirements.txt; nunca versionar.
+.venv/
+__pycache__/
+*.py[cod]
+
 # Docs internos (não versionar)
 CLAUDE.md
 pinia.txt

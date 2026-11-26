@@ -34,6 +34,8 @@ const COLUNAS_OBRIGATORIAS = [
   'data_contratacao',
 ]
 const COLUNAS_TEXTO = ['codigo_cliente', 'nome_cliente', 'consultor', 'email', 'segmento', 'servicos_contratados', 'cidade', 'uf']
+// Desvios cosméticos: entram no relatório, mas não impedem o envio ao backend.
+const TIPOS_AVISO = ['padronizacao', 'espaco_branco']
 const NIVEIS_VALIDOS = ['A', 'B', 'C']
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const UFS_VALIDAS = [
@@ -96,8 +98,25 @@ export const useValidacaoPlanilhaStore = defineStore('validacaoPlanilha', {
       return this.linhasComErro.size
     },
 
+    // Só os tipos que realmente impedem o envio. "padronizacao" e "espaco_branco"
+    // ficam de fora de propósito: são exatamente os desvios que o sistema existe
+    // para corrigir ("IND." → "Indústria"), e tratarLinha/padronizar já os resolvem.
+    // Bloquear por eles descartava a maior parte da planilha antes do ETL.
+    linhasBloqueadas: (state) =>
+      new Set(state.erros.filter((erro) => !TIPOS_AVISO.includes(erro.tipo)).map((erro) => erro.linha)),
+
+    totalRegistrosBloqueados() {
+      return this.linhasBloqueadas.size
+    },
+
+    // Válido = vai para o backend. Inclui as linhas que só têm aviso.
     totalRegistrosValidos() {
-      return this.totalRegistros - this.totalRegistrosComErro
+      return this.totalRegistros - this.totalRegistrosBloqueados
+    },
+
+    // Linhas que seguem para o ETL, mas carregam algum desvio corrigido.
+    totalRegistrosComAviso() {
+      return [...this.linhasComErro].filter((linha) => !this.linhasBloqueadas.has(linha)).length
     },
 
     errosPorTipo: (state) => {
@@ -137,16 +156,15 @@ export const useValidacaoPlanilhaStore = defineStore('validacaoPlanilha', {
       }, {})
     },
 
-    // Linhas brutas que não têm nenhum erro registrado — útil para o próximo
-    // passo de enviar só os registros válidos ao backend.
+    // Linhas brutas sem erro bloqueante — as que seguem para o backend.
     linhasValidas() {
-      return this.linhas.filter((linha) => !this.linhasComErro.has(linha._linha))
+      return this.linhas.filter((linha) => !this.linhasBloqueadas.has(linha._linha))
     },
 
     // Mesmas linhas de linhasValidas, mas já com segmento/nível padronizados
     // (tratarLinha) — é essa versão que vai pro backend em enviarPlanilhaValidada.
     linhasValidasTratadas() {
-      return this.dadosTratados.filter((linha) => !this.linhasComErro.has(linha._linha))
+      return this.dadosTratados.filter((linha) => !this.linhasBloqueadas.has(linha._linha))
     },
   },
 

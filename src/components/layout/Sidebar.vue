@@ -87,7 +87,6 @@ import logoIcone from '../../assets/logo/nortedata_logosemfundo.png'
 import iconeDashboard from '../../assets/logo/iconessidebar/iconedashboard.png'
 import iconeCarteira from '../../assets/logo/iconessidebar/iconecarteira.png'
 import iconeConsultoresImg from '../../assets/logo/iconessidebar/iconeconsultores.png'
-import iconeConfig from '../../assets/logo/iconessidebar/iconeconfig.png'
 import iconeUpload from '../../assets/logo/iconessidebar/iconeupload.png'
 import iconeRelatorio from '../../assets/logo/iconessidebar/iconerelatorio.png'
 import iconePerfil from '../../assets/logo/iconessidebar/iconeperfil.png'
@@ -111,13 +110,16 @@ function icone(path) {
     )
 }
 
+// "Configurações" (/configuracoes) saiu daqui: era link para uma rota inexistente e
+// virou a tela de Perfil, já linkada no rodapé da barra.
 const itens = [
   { label: 'Painel Principal', to: '/dashboard', iconeSrc: iconeDashboard },
-  { label: 'Minha Carteira', to: '/carteira', iconeSrc: iconeCarteira },
-  { label: 'Consultores', to: '/consultores', iconeSrc: iconeConsultoresImg },
-  { label: 'Configurações', to: '/configuracoes', iconeSrc: iconeConfig },
+  { label: 'Evolução', to: '/evolucao', icone: icone('M3 17l6-6 4 4 7-7M16 8h5v5') },
+  { label: 'Minha Carteira', to: '/relatorios', iconeSrc: iconeCarteira },
   { label: 'Importar Dados', to: '/upload', iconeSrc: iconeUpload },
+  { label: 'Histórico de Uploads', to: '/historico-uploads', icone: icone('M12 8v4l3 3M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z') },
   { label: 'Relatório da Planilha', to: '/relatorio-validacao', iconeSrc: iconeRelatorio },
+  { label: 'Consultores', to: '/consultores', iconeSrc: iconeConsultoresImg },
   { label: 'Usuários', to: '/usuarios', admin: true, icone: icone('M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21a6 6 0 0 1 12 0M20 8v4m-2-2h4') },
 ]
 

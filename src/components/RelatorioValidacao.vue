@@ -44,18 +44,22 @@
         </ul>
       </div>
 
-      <section class="grid gap-4 mt-6 sm:grid-cols-3">
+      <section class="grid gap-4 mt-6 sm:grid-cols-4">
         <article class="p-5 bg-white rounded-lg border border-gray-200 shadow-sm">
           <h2 class="text-sm text-gray-500">Total de Registros</h2>
           <p class="mt-1 text-2xl font-bold text-slate-900">{{ store.totalRegistros }}</p>
         </article>
         <article class="p-5 bg-white rounded-lg border border-gray-200 shadow-sm">
-          <h2 class="text-sm text-gray-500">Registros Válidos</h2>
+          <h2 class="text-sm text-gray-500">Serão Enviados</h2>
           <p class="mt-1 text-2xl font-bold text-green-600">{{ store.totalRegistrosValidos }}</p>
         </article>
         <article class="p-5 bg-white rounded-lg border border-gray-200 shadow-sm">
-          <h2 class="text-sm text-gray-500">Registros com Erro</h2>
-          <p class="mt-1 text-2xl font-bold text-red-600">{{ store.totalRegistrosComErro }}</p>
+          <h2 class="text-sm text-gray-500">Com Aviso (corrigidos)</h2>
+          <p class="mt-1 text-2xl font-bold text-amber-600">{{ store.totalRegistrosComAviso }}</p>
+        </article>
+        <article class="p-5 bg-white rounded-lg border border-gray-200 shadow-sm">
+          <h2 class="text-sm text-gray-500">Bloqueados</h2>
+          <p class="mt-1 text-2xl font-bold text-red-600">{{ store.totalRegistrosBloqueados }}</p>
         </article>
       </section>
 
@@ -170,8 +174,12 @@
               <td class="py-2 pr-4 text-gray-600">{{ store.errosPorTipo[tipo] }}</td>
             </tr>
             <tr class="border-t border-gray-200">
-              <td class="py-2 pr-4 font-semibold text-slate-900">Registros válidos</td>
+              <td class="py-2 pr-4 font-semibold text-slate-900">Serão enviados</td>
               <td class="py-2 pr-4 font-semibold text-green-600">{{ store.totalRegistrosValidos }}</td>
+            </tr>
+            <tr>
+              <td class="py-2 pr-4 font-semibold text-slate-900">Bloqueados</td>
+              <td class="py-2 pr-4 font-semibold text-red-600">{{ store.totalRegistrosBloqueados }}</td>
             </tr>
           </tbody>
         </table>
@@ -286,7 +294,7 @@ async function enviarParaBackend() {
     const { data } = await enviarPlanilhaValidada({
       arquivoNome: store.nomeArquivo,
       linhasValidas: store.linhasValidasTratadas,
-      descartadas: store.totalRegistrosComErro,
+      descartadas: store.totalRegistrosBloqueados,
     })
     resultadoEnvio.value = data
   } catch (e) {

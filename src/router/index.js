@@ -8,6 +8,12 @@ import RelatorioValidacao from '../components/RelatorioValidacao.vue'
 import {useAuthStore} from '../stores/auth'
 import Consultores from '../components/Consultores.vue'
 import Usuarios from '../components/Usuarios.vue'
+import Evolucao from '../components/Evolucao.vue'
+import HistoricoUploads from '../components/HistoricoUploads.vue'
+import Perfil from '../components/Perfil.vue'
+import Erro404 from '../components/Erro404.vue'
+import Relatorios from '../components/Relatorios.vue'
+import DetalheCliente from '../components/DetalheCliente.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -20,6 +26,13 @@ const router = createRouter({
     { path: '/relatorio-validacao', name: 'relatorio-validacao', component: RelatorioValidacao, meta: { privado: true }},
     { path: '/consultores', name: 'consultores', component: Consultores, meta: { privado: true }},
     { path: '/usuarios', name: 'usuarios', component: Usuarios, meta: { privado: true, admin: true }},
+    { path: '/evolucao', name: 'evolucao', component: Evolucao, meta: { privado: true }},
+    { path: '/historico-uploads', name: 'historico-uploads', component: HistoricoUploads, meta: { privado: true }},
+    { path: '/perfil', name: 'perfil', component: Perfil, meta: { privado: true }},
+    { path: '/relatorios', name: 'relatorios', component: Relatorios, meta: { privado: true }},
+    { path: '/clientes/:id', name: 'detalhe-cliente', component: DetalheCliente, meta: { privado: true }},
+    // Catch-all: precisa ser a ÚLTIMA rota, senão engole as de cima.
+    { path: '/:caminho(.*)*', name: 'erro-404', component: Erro404 },
   ],
 })
 

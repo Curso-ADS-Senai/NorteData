@@ -151,6 +151,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { Bar, Doughnut, Line } from 'vue-chartjs'
 import {
   ArcElement,
@@ -187,6 +188,8 @@ const dataHora = (t) => (t ? new Date(t).toLocaleString('pt-BR') : '—')
 const compacto = (n) => Number(n).toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
 // O Python manda "2025-06"; a tela mostra "06/2025".
 const mesLegivel = (mes) => `${mes.slice(5)}/${mes.slice(0, 4)}`
+
+const route = useRoute()
 
 const lote = ref(null)
 const geradoEm = ref(null)
@@ -357,6 +360,12 @@ onMounted(async () => {
     lotes.value = data
   } catch {
     lotes.value = []
+  }
+  // ?loteId=N abre o painel já naquele lote — é como o Histórico de Uploads
+  // linka para cá. O <select> fica sincronizado porque lê o mesmo ref.
+  const loteDaUrl = route.query.loteId
+  if (loteDaUrl) {
+    loteEscolhido.value = String(loteDaUrl)
   }
   await carregar()
 })

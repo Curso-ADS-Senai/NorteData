@@ -13,7 +13,14 @@ COLUNAS = [                                                                     
     "codigo_cliente", "nome_cliente", "consultor", "segmento", "nivel_cliente",     # (continuação)
     "faturamento_anual", "servicos_contratados", "data_contratacao", "cidade", "uf",  # (continuação)
 ]                                                                                   # fecha o bloco
-OBRIGATORIAS = COLUNAS[:8]                                                          # as 8 primeiras são obrigatórias
+# Lista explícita, não uma fatia de COLUNAS: "servicos_contratados" fica no meio da ordem
+# da planilha (índice 6) e precisa ficar DE FORA — é opcional neste projeto, igual ao
+# COLUNAS_OBRIGATORIAS do validacaoPlanilha.js, ao contrário do CONTRATO.md do professor.
+# Cliente sem serviço entra com qtd_servicos = 0 em vez de ser descartado do lote.
+OBRIGATORIAS = [                                                                    # as 7 colunas obrigatórias
+    "codigo_cliente", "nome_cliente", "consultor", "segmento", "nivel_cliente",     # (continuação)
+    "faturamento_anual", "data_contratacao",                                        # (continuação)
+]                                                                                   # fecha o bloco
 
 # Chave = texto sem acento, minúsculo e sem pontuação (veja _simples). Valor = nome padronizado.
 SEGMENTOS = {                                                                       # dicionário: texto simplificado -> nome oficial do segmento
@@ -179,8 +186,7 @@ def tratar(bruto: pd.DataFrame) -> ResultadoTransformacao:                      
     motivos: list[list[str]] = [[] for _ in range(len(df))]                         # lista de motivos de recusa de cada linha
     for i, row in df.iterrows():                                                    # para cada linha
         for c in OBRIGATORIAS:                                                      # para cada coluna obrigatória
-            vazio = (not row["servicos"]) if c == "servicos_contratados" else _vazio(row[c])  # serviços: lista vazia conta como vazio
-            if vazio:                                                               # se está vazio
+            if _vazio(row[c]):                                                      # se está vazio
                 motivos[i].append(f"{c}: vazio ou inválido")                        # anota o motivo
         if i in desconhecidos_idx:                                                  # segmento desconhecido?
             motivos[i].append(f"segmento: '{row['segmento_original']}' não reconhecido")  # anota o motivo

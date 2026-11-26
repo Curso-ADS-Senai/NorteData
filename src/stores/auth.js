@@ -23,6 +23,16 @@ export const useAuthStore = defineStore('auth', {
       return data
     },
 
+    // Relê o usuário no backend e atualiza o cache do localStorage. O que foi
+    // gravado no login pode estar velho — perfil e status mudam pelo lado do
+    // ADMIN (aprovação, bloqueio) sem o usuário refazer login.
+    async carregarUsuario() {
+      const { data } = await api.get('/api/auth/me')
+      this.usuario = data
+      localStorage.setItem('usuario', JSON.stringify(data))
+      return data
+    },
+
     logout() {
       this.token = null
       this.usuario = null
